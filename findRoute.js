@@ -146,6 +146,9 @@ const findRoute = (citiesWithStore, distances, customerCity) => {
 }
 
 
+
+
+//Example output
 const MyRoute = findRoute(cities, distances, 16);
 
 let totalDistance = 0;
