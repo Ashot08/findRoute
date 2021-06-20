@@ -35,7 +35,12 @@ const distances = [
 ]
 
 //function-helper to build graph from distances list
-//return graph like: {sourceId : [ [destinationId, distance], [destinationId, distance]  ... ] ...}
+//return graph looks like:
+// {
+//  sourceId : [ [destinationId, distance], [destinationId, distance]  ... ] ...
+//  sourceId : [ [destinationId, distance], [destinationId, distance]  ... ] ...
+//  sourceId : [ [destinationId, distance], [destinationId, distance]  ... ] ...
+//  }
 const buildGraph = (distances) => {
     let graph = Object.create(null);
 
