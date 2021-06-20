@@ -1,28 +1,8 @@
-const checkHasCityStock = (city, citiesHasStock) => {
-    return citiesHasStock.includes(city);
-}
-
 // list of cities, which has a store (for testing)
-const cities = [1, 2, 3, 4, 5];
+const cities = [7, 6, 2, 4];
 
 //list of distances between cities (for testing)
 const distances = [
-    // {source: 1, destination: 2, distance: 17},
-    // {source: 1, destination: 2, distance: 15},
-    // {source: 1, destination: 3, distance: 10},
-    // {source: 1, destination: 3, distance: 2},
-    // {source: 2, destination: 4, distance: 10},
-    // {source: 2, destination: 6, distance: 100},
-    // {source: 2, destination: 6, distance: 25},
-    // {source: 3, destination: 1, distance: 5},
-    // {source: 6, destination: 2, distance: 25},
-
-    // {source: 1, destination: 3, distance: 117},
-    // {source: 1, destination: 6, distance: 7},
-    // {source: 1, destination: 5, distance: 27},
-    // {source: 1, destination: 2, distance: 17},
-    // {source: 6, destination: 2, distance: 1},
-
     {source: 1, destination: 2, distance: 10},
     {source: 1, destination: 4, distance: 8},
     {source: 1, destination: 3, distance: 6},
@@ -41,19 +21,17 @@ const distances = [
     {source: 7, destination: 8, distance: 6},
     {source: 7, destination: 9, distance: 16},
     {source: 8, destination: 9, distance: 15},
-    {source: 2, destination: 5, distance: 13},
-
-    // {source: 1, destination: 6, distance: 11},
-    // {source: 1, destination: 3, distance: 9},
-    // {source: 1, destination: 2, distance: 7},
-    // {source: 2, destination: 3, distance: 10},
-    // {source: 2, destination: 4, distance: 15},
-    // {source: 3, destination: 4, distance: 11},
-    // {source: 3, destination: 6, distance: 2},
-    // {source: 3, destination: 2, distance: 10},
-    // {source: 6, destination: 5, distance: 9},
-    // {source: 4, destination: 5, distance: 6},
-
+    {source: 9, destination: 5, distance: 43},
+    {source: 10, destination: 16, distance: 8},
+    {source: 10, destination: 11, distance: 5},
+    {source: 12, destination: 11, distance: 4},
+    {source: 11, destination: 10, distance: 12},
+    {source: 13, destination: 14, distance: 8},
+    {source: 12, destination: 13, distance: 100},
+    {source: 11, destination: 13, distance: 34},
+    {source: 17, destination: 18, distance: 6},
+    {source: 16, destination: 17, distance: 160},
+    {source: 8, destination: 10, distance: 15},
 ]
 
 //function-helper to build graph from distances list
@@ -72,11 +50,58 @@ const buildGraph = (distances) => {
 
     for (let item of distances) {
         addEdge(item.source, item.destination, item.distance);
+        addEdge(item.destination, item.source, item.distance);
     }
     return graph;
 }
 
+//function-helper to find closest store from object, which consists only nodes with stores
+const findClosestStore = (nodes) => {
+    let weight = Infinity;
+    let closestStoreId;
+    for (let item in nodes) {
+        if (nodes[+item] && nodes[+item].totalWeight < weight) {
+            weight = nodes[+item].totalWeight;
+            closestStoreId = +item;
+        }
+    }
+    return closestStoreId;
+}
 
+//function-helper to get shortest route from store to customer city
+const getRouteFromClosestStore = (closestStoreId, customerCityId, citiesRoutesDataObject) => {
+    let currentId = closestStoreId;
+    let data = [
+        //{
+        //    from: Id
+        //    to: Id
+        //    distance: Distance
+        //    message: ...
+        // }
+    ];
+
+    if (currentId === customerCityId) {
+        data.push({message: 'Store located in your city!'});
+        return data;
+    }
+
+    while (currentId !== customerCityId) {
+        let nextId = citiesRoutesDataObject[currentId].previousCity;
+        let distance = citiesRoutesDataObject[currentId].totalWeight - citiesRoutesDataObject[nextId].totalWeight;
+        data.push(
+            {
+                from: currentId,
+                to: nextId,
+                distance: distance,
+                message: `From ${currentId} to ${nextId}, distance ${distance}`
+            }
+        )
+        currentId = nextId;
+    }
+    return data;
+}
+
+//main function
 const findRoute = (citiesWithStore, distances, customerCity) => {
     const graph = buildGraph(distances);
     let currentCity = customerCity;
@@ -113,7 +138,20 @@ const findRoute = (citiesWithStore, distances, customerCity) => {
         citiesRoutesData[currentCity].done = true;
     }
 
-    console.log(citiesRoutesData);
+    let nodesWithStore = Object.create(null);
+    for (let item of cities) {
+        nodesWithStore[item] = citiesRoutesData[item];
+    }
+    return getRouteFromClosestStore(findClosestStore(nodesWithStore), customerCity, citiesRoutesData);
 }
 
-findRoute(cities, distances, 1);
+
+const MyRoute = findRoute(cities, distances, 16);
+
+let totalDistance = 0;
+let summaryMessage = '';
+for (route of MyRoute) {
+    totalDistance += +route.distance;
+    summaryMessage += ` / ${route.message}`;
+}
+console.log(summaryMessage + ' / Total Distance: ' + totalDistance);
