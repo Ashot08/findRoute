@@ -34,7 +34,7 @@ const distances = [
     {source: 8, destination: 10, distance: 15},
 ]
 
-//function-helper to build graph from distances list
+//buildGraph: function-helper to build graph from distances list
 //return graph looks like:
 // {
 //  sourceId : [ [destinationId, distance], [destinationId, distance]  ... ] ...
@@ -60,7 +60,7 @@ const buildGraph = (distances) => {
     return graph;
 }
 
-//function-helper to find closest store from object, which consists only nodes with stores
+//findClosestStore: function-helper to find closest store from object, which consists only nodes with stores
 const findClosestStore = (nodes) => {
     let weight = Infinity;
     let closestStoreId;
@@ -73,7 +73,7 @@ const findClosestStore = (nodes) => {
     return closestStoreId;
 }
 
-//function-helper to get shortest route from store to customer city
+//getRouteFromClosestStore: function-helper to get shortest route from store to customer city
 const getRouteFromClosestStore = (closestStoreId, customerCityId, citiesRoutesDataObject) => {
     let currentId = closestStoreId;
     let data = [
@@ -154,7 +154,7 @@ const findRoute = (citiesWithStore, distances, customerCity) => {
 
 
 //Example output
-const MyRoute = findRoute(cities, distances, 16);
+const MyRoute = findRoute(cities, distances, 1);
 
 let totalDistance = 0;
 let summaryMessage = '';
